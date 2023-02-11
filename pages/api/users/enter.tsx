@@ -1,21 +1,65 @@
-import client from "@/libs/client";
+import client from "@/libs/sever/client";
+import { prisma } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // await client.user.create({
-  //   data: {
-  //     email: "hi",
-  //     name: "hi",
-  //   },
-  // });
+  const { phone, email } = req.body;
 
-  // res.json({
-  //   ok: true,
-  // });
-  console.log(req.body.email);
+  const payload = phone ? { phone: +phone } : { email };
+
+  const user = await client.user.upsert({
+    where: {
+      ...payload,
+    },
+    create: {
+      name: "Anonymous",
+      ...payload,
+    },
+    update: {},
+  });
+
+  console.log(user);
+
+  // if (email) {
+  //   user = await client.user.findUnique({
+  //     where: {
+  //       email,
+  //     },
+  //   });
+  //   if (user) console.log("find it");
+  //   if (!user) {
+  //     console.log("Did not found. Will create.");
+  //     user = await client.user.create({
+  //       data: {
+  //         name: "Anonymous",
+  //         email,
+  //       },
+  //     });
+  //   }
+  //   console.log(user);
+  // }
+
+  // if (phone) {
+  //   user = await client.user.findUnique({
+  //     where: {
+  //       phone: +phone,
+  //     },
+  //   });
+  //   if (user) console.log("find it");
+  //   if (!user) {
+  //     console.log("Did not found. Will create.");
+  //     user = await client.user.create({
+  //       data: {
+  //         name: "Anonymous",
+  //         phone: +phone,
+  //       },
+  //     });
+  //   }
+  //   console.log(user);
+  // }
 
   res.status(200).end();
 }
