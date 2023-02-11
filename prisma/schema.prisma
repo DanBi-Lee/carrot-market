@@ -8,6 +8,7 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
 model User {
@@ -18,4 +19,14 @@ model User {
   avatar String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  tokens Token[]
+}
+
+model Token {
+  id Int @id @default(autoincrement())
+  payload String @unique
+  user User @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId Int
 }
